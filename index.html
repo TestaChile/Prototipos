@@ -162,6 +162,10 @@
             background: transparent;
             border: none;
             border-radius: 8px;
+            display: block;
+            position: relative;
+            z-index: 1;
+            box-shadow: none;
         }
 
         .info-section {
@@ -849,10 +853,8 @@
                             shadow-softness="1.2"
                             environment-image="environments/studio_country_hall_2k.hdr"
                             interaction-prompt="none"
-                            xr-environment
                             loading="eager"
                             auto-rotate-delay="0"
-                            style="opacity:0; transition: opacity 0.5s ease-in-out;"
                         >
                             <button slot="ar-button" class="ar-button">
                                 <i class="fas fa-cube"></i> AR
@@ -938,90 +940,148 @@
     </div> <!-- Cierre main-content -->
 
     <script>
-    // Sistema de carga EXACTO como el original que funcionaba
-    window.addEventListener('DOMContentLoaded', () => {
-        console.log('🚀 Iniciando carga del modelo 3D (método original)...');
-        
-        const modelViewer = document.getElementById('main-model');
-        const loadingScreen = document.getElementById('loading-screen');
-        const mainContent = document.getElementById('main-content');
+    // SISTEMA DE CARGA PROGRESIVA (copiado del index.html que funciona)
+    let loadedModels = 0;
+    let totalModels = 1; // Solo tenemos 1 modelo en este archivo
+    let loadingStartTime = Date.now();
+
+    // Actualizar barra de progreso
+    function updateProgress(loaded, total) {
+        const percentage = Math.round((loaded / total) * 100);
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         
-        // Detectar dispositivo móvil
-        const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        console.log(`📱 Dispositivo móvil: ${isMobile}`);
-        
-        // Progreso inicial
-        let progress = 0;
-        progressBar.style.width = '0%';
-        progressText.textContent = 'Iniciando carga del modelo 3D... 0%';
-        
-        // Simular progreso durante la carga
-        const progressInterval = setInterval(() => {
-            if (progress < 80) {
-                progress += Math.random() * 10;
-                progressBar.style.width = Math.min(progress, 80) + '%';
-                
-                if (progress < 30) {
-                    progressText.textContent = `Cargando geometría... ${Math.floor(progress)}%`;
-                } else if (progress < 60) {
-                    progressText.textContent = `Cargando texturas... ${Math.floor(progress)}%`;
-                } else {
-                    progressText.textContent = `Optimizando modelo... ${Math.floor(progress)}%`;
-                }
+        if (progressBar && progressText) {
+            progressBar.style.width = percentage + '%';
+            
+            if (percentage < 30) {
+                progressText.textContent = `Iniciando carga de modelo 3D... ${percentage}%`;
+            } else if (percentage < 70) {
+                progressText.textContent = `Cargando texturas y geometrías... ${percentage}%`;
+            } else if (percentage < 95) {
+                progressText.textContent = `Optimizando experiencia 3D... ${percentage}%`;
+            } else {
+                progressText.textContent = `¡Casi listo! Preparando modelo... ${percentage}%`;
             }
-        }, 200);
-        
-        // Función para completar la carga
-        function completeLoading() {
-            console.log('✅ Completando carga del modelo');
-            clearInterval(progressInterval);
-            
-            progressBar.style.width = '100%';
-            progressText.textContent = '¡Carga completada! 100%';
-            
-            setTimeout(() => {
-                // Ocultar pantalla de carga
-                loadingScreen.style.opacity = '0';
-                // Mostrar modelo
-                modelViewer.style.opacity = '1';
-                // Mostrar contenido principal
-                mainContent.classList.add('loaded');
-                
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 500);
-            }, 300);
         }
+    }
+
+    // Mostrar contenido principal cuando todo esté cargado
+    function showMainContent() {
+        const loadingTime = (Date.now() - loadingStartTime) / 1000;
+        console.log(`🎯 Modelo cargado en ${loadingTime.toFixed(1)}s`);
+        
+        // Pequeña pausa para mostrar 100% antes de ocultar
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainContent = document.getElementById('main-content');
+            
+            if (loadingScreen && mainContent) {
+                loadingScreen.classList.add('hidden');
+                mainContent.classList.add('loaded');
+            }
+        }, 500);
+    }
+
+    // Fallback timer - mostrar contenido después de máximo 15 segundos
+    let fallbackTimer = setTimeout(() => {
+        console.warn('⏰ Timeout: Mostrando contenido por seguridad');
+        updateProgress(totalModels, totalModels);
+        showMainContent();
+    }, 15000);
+
+    // Función para manejar carga de modelo individual (igual que en index.html)
+    function onModelLoad() {
+        loadedModels++;
+        console.log(`✅ Modelo cargado (${loadedModels}/${totalModels})`);
+        updateProgress(loadedModels, totalModels);
+        
+        if (loadedModels >= totalModels) {
+            clearTimeout(fallbackTimer);
+            showMainContent();
+        }
+    }
+
+    // Función para manejar errores de carga
+    function onModelError(error) {
+        console.error('❌ Error cargando modelo:', error);
+        loadedModels++;
+        updateProgress(loadedModels, totalModels);
+        
+        if (loadedModels >= totalModels) {
+            clearTimeout(fallbackTimer);
+            showMainContent();
+        }
+    }
+
+    // Iniciar carga cuando esté listo el DOM (IGUAL que index.html)
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 Iniciando carga de modelo 3D...');
+        updateProgress(0, totalModels);
+        
+        const modelViewer = document.getElementById('main-model');
         
         if (modelViewer) {
-            // Evento de carga exitosa (IGUAL al original)
-            modelViewer.addEventListener('load', () => {
-                console.log('✅ Modelo cargado exitosamente via evento load');
-                completeLoading();
-            });
+            // Configurar eventos de carga (IGUAL que en index.html)
+            modelViewer.addEventListener('load', onModelLoad);
+            modelViewer.addEventListener('ready', onModelLoad);
+            modelViewer.addEventListener('error', onModelError);
             
-            // Evento de error
-            modelViewer.addEventListener('error', (error) => {
-                console.error('❌ Error cargando modelo:', error);
-                clearInterval(progressInterval);
+            // Autorrotación para móviles (copiado de index.html)
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            
+            if (isTouchDevice) {
+                modelViewer.addEventListener('touchstart', () => {
+                    if (!modelViewer.hasAttribute('auto-rotate')) {
+                        modelViewer.setAttribute('auto-rotate', '');
+                        modelViewer.setAttribute('rotation-per-second', '60deg');
+                        
+                        setTimeout(() => {
+                            modelViewer.removeAttribute('auto-rotate');
+                            modelViewer.removeAttribute('rotation-per-second');
+                        }, 3000);
+                    }
+                });
+            } else {
+                // Desktop hover para rotación
+                modelViewer.addEventListener('mouseenter', () => {
+                    modelViewer.setAttribute('auto-rotate', '');
+                    modelViewer.setAttribute('rotation-per-second', '90deg');
+                });
                 
-                // Mostrar contenido de todas formas
-                setTimeout(() => {
-                    completeLoading();
-                }, 1000);
+                modelViewer.addEventListener('mouseleave', () => {
+                    modelViewer.removeAttribute('auto-rotate');
+                    modelViewer.removeAttribute('rotation-per-second');
+                });
+            }
+        }
+        
+        // Configuraciones específicas por dispositivo (copiado de index.html)
+        if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+            document.querySelectorAll('model-viewer').forEach(viewerEl => {
+                viewerEl.setAttribute('field-of-view', '30deg');
             });
-            
-            // Timeout según dispositivo (IGUAL al original)
-            const timeoutDuration = isMobile ? 15000 : 10000;
-            
-            setTimeout(() => {
-                if (loadingScreen.style.display !== 'none') {
-                    console.log('⚠️ Timeout - mostrando contenido por seguridad');
-                    completeLoading();
+        } else if (navigator.userAgent.match(/Android/i)) {
+            document.querySelectorAll('model-viewer').forEach(viewerEl => {
+                viewerEl.setAttribute('field-of-view', '35deg');
+            });
+        }
+        
+        // Mejorar rendimiento en dispositivos móviles
+        if (window.innerWidth < 768) {
+            document.querySelectorAll('model-viewer').forEach(viewerEl => {
+                viewerEl.setAttribute('shadow-intensity', '1');
+                viewerEl.setAttribute('shadow-softness', '0.5');
+            });
+        }
+        
+        // Prevenir zoom accidental en iOS (copiado de index.html)
+        if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+            document.addEventListener('touchmove', function (event) {
+                if (event.scale !== 1) {
+                    event.preventDefault();
                 }
-            }, timeoutDuration);
+            }, { passive: false });
         }
     });
     </script>
