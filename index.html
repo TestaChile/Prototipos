@@ -19,49 +19,59 @@
         @import url('https://fonts.googleapis.com/css2?family=Consolas&display=swap');
         
         body {
+            font-family: 'Consolas', monospace;
             margin: 0;
             padding: 20px;
-            background: #f5f5f5;
-            font-family: Arial, sans-serif;
-            color: #333;
-            line-height: 1.6;
+            background: #f1f1f1;
+            text-align: center;
             min-height: 100vh;
         }
         
         h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+            color: #000;
+            margin: 0 auto 15px;
             font-size: 28px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            max-width: 800px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin: 0 auto 25px;
+            max-width: 800px;
+            font-style: italic;
         }
         
         .description {
-            text-align: center;
-            margin-bottom: 30px;
+            color: #000;
             font-size: 16px;
-            line-height: 1.8;
-            color: #555;
+            margin: 0 auto 30px;
             max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            line-height: 1.6;
+            text-align: left;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
         }
         
         .description i {
             color: #4A90E2;
             margin-right: 8px;
-            width: 16px;
+            width: 20px;
             text-align: center;
         }
         
         .description .icon-highlight {
-            color: #E74C3C;
+            color: #6e48aa;
         }
         
         .description .icon-success {
-            color: #27AE60;
+            color: #25D366;
+        }
+        
+        .description .icon-warning {
+            color: #FF6B35;
         }
         
         .social-buttons {
@@ -141,11 +151,11 @@
         /* CONTENEDOR PRINCIPAL DE LA CARD */
         .main-card-container {
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 0 auto 30px;
             background: white;
+            padding: 20px;
+            border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-            border-radius: 0;
-            overflow: hidden;
             transition: box-shadow 0.3s, transform 0.3s;
         }
         
@@ -154,37 +164,85 @@
             transform: translateY(-2px);
         }
 
+        .product-title {
+            font-weight: bold;
+            margin: 0 0 8px;
+            color: #333;
+            font-size: 24px;
+            border-bottom: 2px solid #4A90E2;
+            padding-bottom: 8px;
+        }
+        
+        .product-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin: 0 0 20px;
+            font-style: italic;
+        }
+
         /* LAYOUT HORIZONTAL - MODELO A LA IZQUIERDA, INFO A LA DERECHA */
         .card-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 500px;
-            align-items: stretch;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
         }
 
         .model-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .model-viewer-container {
+            width: 100%;
+            height: 500px;
+            margin-bottom: 20px;
             position: relative;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .model-section model-viewer {
             width: 100%;
-            height: 450px;
+            height: 100%;
             background: transparent;
             border: none;
-            box-shadow: none;
+            border-radius: 8px;
         }
 
         .info-section {
-            padding: 40px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* INFORMACIÓN DEL PRODUCTO */
+        .product-info {
+            text-align: left;
+            margin-top: 20px;
+        }
+        
+        .info-section-block {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4A90E2;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background: white;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #555;
         }
 
         .model-title {
@@ -206,72 +264,83 @@
         .dimensions-block {
             background: #e2e2e2;
             border-radius: 8px;
-            margin-bottom: 25px;
-            padding: 20px;
+            margin: 20px 0;
+            padding: 15px;
             font-family: 'Consolas', monospace;
+            font-size: 13px;
             color: #222;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
         }
 
         .dimensions-title {
             font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 15px;
+            font-size: 16px;
+            margin-bottom: 10px;
             color: #333;
             letter-spacing: 0.5px;
-            text-align: center;
         }
 
         .dimensions-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
             gap: 15px;
-            text-align: center;
+            margin-top: 10px;
         }
 
         .dimension-item {
             display: flex;
             flex-direction: column;
             align-items: center;
+            text-align: center;
         }
 
         .dimension-label {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+            text-transform: uppercase;
             font-weight: normal;
         }
 
         .dimension-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #222;
-        }
-
-        /* ENLACE DE PRODUCTO */
-        .product-link {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            color: #4A90E2;
-            font-weight: bold;
             font-size: 16px;
-            text-decoration: none;
-            border: 2px solid #4A90E2;
-            border-radius: 25px;
-            padding: 12px 24px;
-            transition: all 0.3s;
-            cursor: pointer;
-            text-align: center;
-            background: transparent;
+            font-weight: bold;
+            color: #333;
         }
 
-        .product-link:hover, .product-link:focus {
-            color: white;
-            background: #4A90E2;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        /* BOTONES DE ACCIÓN */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
+        
+        .action-btn {
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            min-width: 140px;
+            justify-content: center;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .action-btn.whatsapp { background: #25D366; }
+        .action-btn.main-catalog { background: #2C3E50; }
+        .action-btn.share { background: #4A90E2; }
 
         /* LOGO */
         .logo-container {
@@ -305,7 +374,11 @@
             margin: 40px auto 20px;
             text-align: center;
             max-width: 600px;
-            line-height: 1.8;
+            line-height: 1.5;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         /* LOADING SCREEN */
@@ -438,22 +511,21 @@
             }
 
             .card-content {
-                grid-template-columns: 1fr;
-                min-height: auto;
+                flex-direction: column;
+                gap: 20px;
             }
-
-            .model-section {
-                order: 1;
-                padding: 15px;
-            }
-
-            .model-section model-viewer {
+            
+            .model-viewer-container {
                 height: 350px;
             }
-
-            .info-section {
-                order: 2;
-                padding: 25px;
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                min-width: 200px;
             }
 
             .model-title {
@@ -519,16 +591,17 @@
                 margin: 0 5px;
             }
 
-            .model-section {
-                padding: 10px;
-            }
-
-            .model-section model-viewer {
+            .model-viewer-container {
                 height: 280px;
             }
-
-            .info-section {
-                padding: 20px;
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                min-width: 250px;
             }
 
             .model-title {
@@ -633,12 +706,22 @@
                 margin: 0;
             }
 
-            .model-section model-viewer {
+            .model-viewer-container {
                 height: 250px;
             }
-
-            .info-section {
-                padding: 15px;
+            
+            .card-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                min-width: 220px;
             }
 
             .model-title {
@@ -706,7 +789,7 @@
 
         /* Dispositivos muy pequeños */
         @media (max-width: 320px) {
-            .model-section model-viewer {
+            .model-viewer-container {
                 height: 220px;
             }
 
@@ -798,92 +881,123 @@
         </div>
         
         <h1>CATÁLOGO 3D | TESTA CHILE</h1>
+        <div class="subtitle">Visualización exclusiva de productos personalizados</div>
         
         <div class="description">
-            <i class="fas fa-cube"></i>Explora nuestro <strong>Catálogo 3D</strong> interactivo.<br>
-            <i class="fas fa-eye"></i>Descubre trabajos realizados para nuestros clientes.<br>
-            <span class="desktop-only"><i class="fas fa-mouse-pointer"></i>Pasa el mouse sobre el modelo para verlo rotar.<br></span>
-            <span class="mobile-only"><i class="fas fa-hand-pointer"></i>Toca el modelo 3D para verlo rotar.<br></span><br>
-            <i class="fas fa-cogs icon-highlight"></i>Productos <strong>PERSONALIZADOS</strong> y <strong>A LA MEDIDA</strong>.<br>
-            <i class="fas fa-shopping-cart icon-success"></i>Disponibles al detalle y por mayor. Contamos con <strong>boleta y factura</strong>.<br>
-            <i class="fas fa-mobile-alt"></i><strong>Realidad Aumentada</strong> desde dispositivos móviles. 
-        </div>
-        
-        <!-- Botones de redes sociales -->
-        <div class="social-buttons">
-            <a href="https://www.instagram.com/testa.cl/" class="social-btn instagram">
-                Instagram
-            </a>
-            <button class="social-btn whatsapp" onclick="window.open('https://wa.me/56953706307', '_self')">
-                WhatsApp
-            </button>
-            <a href="https://linktr.ee/testa.cl" class="social-btn main-page">
-                Página principal
-            </a>
+            <i class="fas fa-cube"></i><strong>Bienvenido a nuestro Catálogo 3D interactivo</strong><br><br>
+            <i class="fas fa-eye"></i>Explora trabajos realizados para nuestros clientes de manera inmersiva.<br>
+            <i class="fas fa-cogs icon-highlight"></i>Cada producto es <strong>PERSONALIZADO</strong> y fabricado <strong>A LA MEDIDA</strong>.<br>
+            <i class="fas fa-mobile-alt"></i>Incluye <strong>Realidad Aumentada</strong> para visualizar productos en tu espacio real.<br><br>
+            <i class="fas fa-info-circle icon-highlight"></i><strong>Funcionamiento:</strong><br>
+            • Rota el modelo 3D arrastrando con el mouse o dedo<br>
+            • Usa el botón <strong>AR</strong> para ver el producto en tu espacio real<br>
+            • Revisa todas las especificaciones técnicas más abajo<br><br>
+            <i class="fas fa-shopping-cart icon-success"></i><strong>Disponibilidad:</strong> Al detalle y por mayor. Contamos con <strong>boleta y factura</strong>.<br>
+            <i class="fas fa-phone icon-warning"></i>Para consultas personalizadas, contáctanos directamente vía WhatsApp.
         </div>
         
         <!-- Contenedor principal de la card -->
         <div class="main-card-container">
+            <div class="product-title">Stand QR Acrílico con Relieve SIMPLY GYM</div>
+            <div class="product-subtitle">Fabricación: 20 de Julio del 2025</div>
+            
             <div class="card-content">
                 <!-- Sección del modelo 3D (izquierda en desktop) -->
                 <div class="model-section">
-                    <model-viewer
-                        id="main-model"
-                        src="3dmodels/GLB_Prototipo_SIMPLYGYM.glb"
-                        alt="Stand QR Acrílico con Relieve SIMPLY GYM"
-                        camera-orbit="45deg 60deg 2.5m"
-                        ar
-                        ar-modes="webxr scene-viewer quick-look"
-                        camera-controls
-                        shadow-intensity="2"
-                        shadow-softness="1.2"
-                        environment-image="environments/studio_country_hall_2k.hdr"
-                        interaction-prompt="none"
-                        xr-environment
-                        loading="eager"
-                        auto-rotate-delay="0"
-                    >
-                        <button slot="ar-button" class="ar-button">
-                            AR
-                        </button>
-                    </model-viewer>
+                    <div class="model-viewer-container">
+                        <model-viewer
+                            id="main-model"
+                            src="3dmodels/GLB_Prototipo_SIMPLYGYM.glb"
+                            alt="Stand QR Acrílico con Relieve SIMPLY GYM"
+                            camera-orbit="45deg 60deg 2.5m"
+                            ar
+                            ar-modes="webxr scene-viewer quick-look"
+                            camera-controls
+                            shadow-intensity="2"
+                            shadow-softness="1.2"
+                            environment-image="environments/studio_country_hall_2k.hdr"
+                            interaction-prompt="none"
+                            xr-environment
+                            loading="eager"
+                            auto-rotate-delay="0"
+                        >
+                            <button slot="ar-button" class="ar-button">
+                                <i class="fas fa-cube"></i> AR
+                            </button>
+                        </model-viewer>
+                    </div>
                 </div>
                 
                 <!-- Sección de información (derecha en desktop) -->
                 <div class="info-section">
-                    <h3 class="model-title">Stand QR Acrílico con Relieve SIMPLY GYM</h3>
-                    <div class="model-subtitle">Fabricación: 20 de Julio del 2025</div>
-                    
-                    <div class="dimensions-block">
-                        <div class="dimensions-title">Dimensiones</div>
-                        <div class="dimensions-grid">
-                            <div class="dimension-item">
-                                <div class="dimension-label">Alto</div>
-                                <div class="dimension-value">12 cm</div>
+                    <div class="product-info">
+                        <div class="info-section-block">
+                            <div class="info-title">
+                                <i class="fas fa-clipboard-list"></i>
+                                Descripción del Producto
                             </div>
-                            <div class="dimension-item">
-                                <div class="dimension-label">Ancho</div>
-                                <div class="dimension-value">6 cm</div>
+                            <div class="info-content">
+                                Stand de mesa fabricado en acrílico cristal transparente de 5mm de grosor, diseñado específicamente para SimplyGym. Incluye grabado láser de alta precisión con el logotipo corporativo en relieve y pintado con acrílica negra. Ideal para mostrar códigos QR, información promocional o como elemento decorativo en recepción y áreas de atención al cliente.
                             </div>
-                            <div class="dimension-item">
-                                <div class="dimension-label">Largo</div>
-                                <div class="dimension-value">5 cm</div>
+                        </div>
+
+                        <div class="info-section-block">
+                            <div class="info-title">
+                                <i class="fas fa-cogs"></i>
+                                Especificaciones Técnicas
+                            </div>
+                            <div class="info-content">
+                                <strong>Material:</strong> Acrílico cristal transparente<br>
+                                <strong>Grosor:</strong> 5mm<br>
+                                <strong>Acabado:</strong> Semi-brillante, cortado en láser y bordes pulidos<br>
+                                <strong>Grabado:</strong> Láser CO2 de alta precisión, pintado con acrílica negra<br>
+                                <strong>Estado:</strong> Fabricado y entregado
+                            </div>
+                        </div>
+
+                        <div class="dimensions-block">
+                            <div class="dimensions-title">Dimensiones</div>
+                            <div class="dimensions-grid">
+                                <div class="dimension-item">
+                                    <div class="dimension-label">Alto</div>
+                                    <div class="dimension-value">12 cm</div>
+                                </div>
+                                <div class="dimension-item">
+                                    <div class="dimension-label">Ancho</div>
+                                    <div class="dimension-value">6 cm</div>
+                                </div>
+                                <div class="dimension-item">
+                                    <div class="dimension-label">Largo</div>
+                                    <div class="dimension-value">5 cm</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <a href="https://www.instagram.com/testa.cl/" class="product-link" rel="noopener">
-                        ¡Ve aquí el producto!
-                    </a>
                 </div>
             </div>
         </div>
         
+        <div class="action-buttons">
+            <button class="action-btn whatsapp" onclick="window.open('https://wa.me/56953706307', '_self')">
+                <i class="fas fa-share-alt"></i>
+                Comunicación directa vía WhatsApp
+            </button>
+            <a href="index.html" class="action-btn main-catalog">
+                <i class="fas fa-th-large"></i>
+                Ver Catálogo Completo
+            </a>
+            <a href="https://www.instagram.com/testa.cl/" class="action-btn share" rel="noopener">
+                <i class="fas fa-link"></i>
+                Ver más productos
+            </a>
+        </div>
+        
         <!-- Footer -->
         <div class="footer">
-            Testa Chile 2025 <br><br> 
-            Medios de pago disponibles: Transferencia electrónica y efectivo <br><br> 
-            Próximamente, taller físico para visitas en Santiago, Chile
+            <i class="fas fa-shield-alt"></i> <strong>Catálogo 3D - Testa Chile 2025</strong><br><br>
+            Medios de pago disponibles: Transferencia electrónica y efectivo<br>
+            Próximamente, taller físico para visitas en Santiago, Chile<br><br>
+            Para consultas personalizadas o modificaciones, contáctanos directamente vía WhatsApp.
         </div>
         
     </div> <!-- Cierre main-content -->
