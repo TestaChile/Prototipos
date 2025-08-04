@@ -853,6 +853,7 @@
                             shadow-softness="1.2"
                             environment-image="environments/studio_country_hall_2k.hdr"
                             interaction-prompt="none"
+                            xr-environment
                             loading="eager"
                             auto-rotate-delay="0"
                         >
@@ -990,30 +991,6 @@
         showMainContent();
     }, 15000);
 
-    // Función para manejar carga de modelo individual (igual que en index.html)
-    function onModelLoad() {
-        loadedModels++;
-        console.log(`✅ Modelo cargado (${loadedModels}/${totalModels})`);
-        updateProgress(loadedModels, totalModels);
-        
-        if (loadedModels >= totalModels) {
-            clearTimeout(fallbackTimer);
-            showMainContent();
-        }
-    }
-
-    // Función para manejar errores de carga
-    function onModelError(error) {
-        console.error('❌ Error cargando modelo:', error);
-        loadedModels++;
-        updateProgress(loadedModels, totalModels);
-        
-        if (loadedModels >= totalModels) {
-            clearTimeout(fallbackTimer);
-            showMainContent();
-        }
-    }
-
     // Iniciar carga cuando esté listo el DOM (IGUAL que index.html)
     window.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 Iniciando carga de modelo 3D...');
@@ -1022,20 +999,69 @@
         const modelViewer = document.getElementById('main-model');
         
         if (modelViewer) {
-            // Configurar eventos de carga (IGUAL que en index.html)
-            modelViewer.addEventListener('load', onModelLoad);
-            modelViewer.addEventListener('ready', onModelLoad);
-            modelViewer.addEventListener('error', onModelError);
+            // Eventos de carga progresiva (COPIADO EXACTO del index.html)
+            modelViewer.addEventListener('load', () => {
+                loadedModels++;
+                updateProgress(loadedModels, totalModels);
+                console.log(`✅ Modelo cargado: Prototipo SIMPLYGYM (${loadedModels}/${totalModels})`);
+                
+                // Si todos los modelos están cargados, mostrar contenido
+                if (loadedModels >= totalModels) {
+                    updateProgress(totalModels, totalModels); // Asegurar 100%
+                    clearTimeout(fallbackTimer); // Limpiar el timer
+                    showMainContent();
+                }
+            });
+
+            // También escuchar el evento 'ready' como fallback (COPIADO EXACTO)
+            modelViewer.addEventListener('ready', () => {
+                if (!modelViewer.hasAttribute('data-loaded')) {
+                    modelViewer.setAttribute('data-loaded', 'true');
+                    loadedModels++;
+                    updateProgress(loadedModels, totalModels);
+                    console.log(`✅ Modelo listo: Prototipo SIMPLYGYM (${loadedModels}/${totalModels})`);
+                    
+                    if (loadedModels >= totalModels) {
+                        updateProgress(totalModels, totalModels);
+                        clearTimeout(fallbackTimer); // Limpiar el timer
+                        showMainContent();
+                    }
+                }
+            });
+
+            // Manejo de errores de carga (COPIADO EXACTO)
+            modelViewer.addEventListener('error', (event) => {
+                console.warn(`⚠️ Error cargando modelo: Prototipo SIMPLYGYM`, event);
+                loadedModels++; // Contar como "cargado" para no bloquear
+                updateProgress(loadedModels, totalModels);
+                
+                if (loadedModels >= totalModels) {
+                    updateProgress(totalModels, totalModels);
+                    clearTimeout(fallbackTimer); // Limpiar el timer
+                    showMainContent();
+                }
+            });
+
+            // Optimización de rendimiento (COPIADO EXACTO)
+            modelViewer.addEventListener('model-visibility', (event) => {
+                if (!event.detail.visible) {
+                    // Pausar animaciones cuando no es visible
+                    modelViewer.removeAttribute('auto-rotate');
+                }
+            });
             
-            // Autorrotación para móviles (copiado de index.html)
+            // Autorrotación mejorada para móviles (COPIADO EXACTO del index.html)
             const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
             
             if (isTouchDevice) {
-                modelViewer.addEventListener('touchstart', () => {
-                    if (!modelViewer.hasAttribute('auto-rotate')) {
+                // En móviles, rotar al tocar el modelo directamente
+                modelViewer.addEventListener('touchstart', (e) => {
+                    // No prevenir el evento para permitir interacción con el modelo
+                    if (modelViewer.loaded && !modelViewer.hasAttribute('auto-rotate')) {
                         modelViewer.setAttribute('auto-rotate', '');
                         modelViewer.setAttribute('rotation-per-second', '60deg');
                         
+                        // Parar rotación después de 3 segundos
                         setTimeout(() => {
                             modelViewer.removeAttribute('auto-rotate');
                             modelViewer.removeAttribute('rotation-per-second');
@@ -1043,15 +1069,24 @@
                     }
                 });
             } else {
-                // Desktop hover para rotación
+                // Comportamiento original para desktop
                 modelViewer.addEventListener('mouseenter', () => {
-                    modelViewer.setAttribute('auto-rotate', '');
-                    modelViewer.setAttribute('rotation-per-second', '90deg');
+                    if (modelViewer.loaded) {
+                        modelViewer.setAttribute('auto-rotate', '');
+                        modelViewer.setAttribute('rotation-per-second', '90deg');
+                        if (typeof modelViewer.jumpCameraToGoal === "function") {
+                            modelViewer.jumpCameraToGoal();
+                        }
+                    }
                 });
-                
                 modelViewer.addEventListener('mouseleave', () => {
                     modelViewer.removeAttribute('auto-rotate');
                     modelViewer.removeAttribute('rotation-per-second');
+                    modelViewer.cameraOrbit = "45deg 60deg 2.5m";
+                    if (typeof modelViewer.resetTurntableRotation === "function") {
+                        modelViewer.resetTurntableRotation();
+                    }
+                    modelViewer.setAttribute('camera-orbit', "45deg 60deg 2.5m");
                 });
             }
         }
