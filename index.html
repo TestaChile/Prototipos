@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catálogo 3D | Testa Chile - Simply Gym</title>
+    <!-- Polyfill para navegadores antiguos -->
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.8.0/webcomponents-loader.js"></script>
+    <!-- Versión fija de model-viewer -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer@2.1.1/dist/model-viewer.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!-- Prevenir zoom y mantener comportamiento consistente -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fuentes -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Consolas&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .description i {
+            color: #4A90E2;
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .description .icon-highlight {
+            color: #E74C3C;
+        }
+        
+        .description .icon-success {
+            color: #27AE60;
+        }
+        
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 0 auto 30px auto;
+            max-width: 600px;
+            flex-wrap: wrap;
+        }
+        
+        .social-btn, .social-buttons a {
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 0;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1 1 0;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-decoration: none;
+        }
+        
+        .social-btn:hover, .social-buttons a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .social-btn.instagram, .social-buttons a.instagram { 
+            background: linear-gradient(45deg, #405DE6, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737); 
+        }
+        
+        .social-btn.whatsapp, .social-buttons a.whatsapp { 
+            background: #25D366; 
+        }
+        
+        .social-btn.main-page, .social-buttons a.main-page { 
+            background: #2C3E50; 
+        }
+
+        .ar-button {
+            position: absolute !important;
+            top: 8px !important;
+            left: 8px !important;
+            background: rgba(74, 144, 226, 0.9) !important;
+            color: white !important;
+            border: none !important;
+            padding: 6px 10px !important;
+            border-radius: 20px !important;
+            font-size: 12px !important;
+            font-family: Arial, sans-serif !important;
+            font-weight: bold !important;
+            margin: 0 !important;
+            transition: all 0.3s !important;
+            cursor: pointer !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 10 !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+            backdrop-filter: blur(5px) !important;
+        }
+        
+        .ar-button:hover {
+            background: rgba(74, 144, 226, 1) !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+        }
+
+        /* CONTENEDOR PRINCIPAL DE LA CARD */
+        .main-card-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            border-radius: 0;
+            overflow: hidden;
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+        
+        .main-card-container:hover {
+            box-shadow: 0 16px 48px rgba(0,0,0,0.22);
+            transform: translateY(-2px);
+        }
+
+        /* LAYOUT HORIZONTAL - MODELO A LA IZQUIERDA, INFO A LA DERECHA */
+        .card-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 500px;
+            align-items: stretch;
+        }
+
+        .model-section {
+            position: relative;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .model-section model-viewer {
+            width: 100%;
+            height: 450px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+
+        .model-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .model-subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        /* DIMENSIONES BLOQUE */
+        .dimensions-block {
+            background: #e2e2e2;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            color: #222;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .dimensions-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .dimensions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+
+        .dimension-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dimension-label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+
+        .dimension-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        /* ENLACE DE PRODUCTO */
+        .product-link {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            color: #4A90E2;
+            font-weight: bold;
+            font-size: 16px;
+            text-decoration: none;
+            border: 2px solid #4A90E2;
+            border-radius: 25px;
+            padding: 12px 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-align: center;
+            background: transparent;
+        }
+
+        .product-link:hover, .product-link:focus {
+            color: white;
+            background: #4A90E2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        /* LOGO */
+        .logo-container {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            z-index: 1000;
+            background: transparent;
+        }
+
+        .logo-img {
+            width: 60px;
+            height: auto;
+            transition: transform 0.3s ease;
+            background: transparent;
+        }
+
+        .logo-img:hover {
+            transform: scale(1.20);
+        }
+
+        .logo-container a {
+            display: inline-block;
+            text-decoration: none;
+            border: none;
+        }
+
+        .footer {
+            font-size: 12px;
+            color: #666;
+            margin: 40px auto 20px;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.8;
+        }
+
+        /* LOADING SCREEN */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f1f1f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-content {
+            text-align: center;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .loading-logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .loading-title {
+            font-family: 'Consolas', monospace;
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .loading-subtitle {
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 300px;
+            height: 8px;
+            background: #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 auto 15px auto;
+            display: block;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4A90E2, #6e48aa);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .loading-tips {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            color: #888;
+            line-height: 1.3;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Ocultar contenido principal durante la carga */
+        .main-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .main-content.loaded {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Clases para mostrar/ocultar contenido según dispositivo */
+        .mobile-only {
+            display: none;
+        }
+
+        .desktop-only {
+            display: inline;
+        }
+
+        /* RESPONSIVE DESIGN */
+        /* Tablets y pantallas medianas */
+        @media (max-width: 1023px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            .description {
+                font-size: 15px;
+                margin-bottom: 20px;
+                padding: 0 10px;
+            }
+
+            .card-content {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+
+            .model-section {
+                order: 1;
+                padding: 15px;
+            }
+
+            .model-section model-viewer {
+                height: 350px;
+            }
+
+            .info-section {
+                order: 2;
+                padding: 25px;
+            }
+
+            .model-title {
+                font-size: 22px;
+                text-align: center;
+            }
+
+            .model-subtitle {
+                font-size: 15px;
+                text-align: center;
+            }
+
+            .dimensions-block {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .dimensions-title {
+                font-size: 16px;
+            }
+
+            .dimension-value {
+                font-size: 18px;
+            }
+
+            .logo-img {
+                width: 50px;
+            }
+        }
+
+        /* Dispositivos móviles grandes */
+        @media (max-width: 767px) {
+            body {
+                padding: 10px 8px;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 12px;
+                line-height: 1.2;
+            }
+
+            .description {
+                font-size: 14px;
+                margin-bottom: 18px;
+                padding: 0 8px;
+                line-height: 1.4;
+            }
+
+            .social-buttons {
+                flex-direction: column;
+                gap: 10px;
+                padding: 0 8px;
+            }
+
+            .social-btn, .social-buttons a {
+                font-size: 14px;
+                padding: 12px 20px;
+                flex: none;
+            }
+
+            .main-card-container {
+                margin: 0 5px;
+            }
+
+            .model-section {
+                padding: 10px;
+            }
+
+            .model-section model-viewer {
+                height: 280px;
+            }
+
+            .info-section {
+                padding: 20px;
+            }
+
+            .model-title {
+                font-size: 20px;
+                margin-bottom: 8px;
+            }
+
+            .model-subtitle {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .dimensions-block {
+                padding: 12px;
+                margin-bottom: 18px;
+            }
+
+            .dimensions-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+
+            .dimensions-grid {
+                gap: 10px;
+            }
+
+            .dimension-label {
+                font-size: 12px;
+            }
+
+            .dimension-value {
+                font-size: 16px;
+            }
+
+            .product-link {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+
+            .ar-button {
+                font-size: 10px !important;
+                padding: 4px 8px !important;
+                top: 6px !important;
+                left: 6px !important;
+                border-radius: 15px !important;
+            }
+
+            .logo-container {
+                top: 12px;
+                left: 12px;
+            }
+
+            .logo-img {
+                width: 45px;
+            }
+
+            .footer {
+                font-size: 11px;
+                margin: 25px auto 10px;
+                padding: 0 8px;
+                line-height: 1.6;
+            }
+
+            .mobile-only {
+                display: inline;
+            }
+
+            .desktop-only {
+                display: none;
+            }
+        }
+
+        /* Dispositivos móviles pequeños */
+        @media (max-width: 479px) {
+            body {
+                padding: 8px 5px;
+            }
+
+            h1 {
+                font-size: 18px;
+                margin-bottom: 10px;
+                padding: 0 5px;
+            }
+
+            .description {
+                font-size: 13px;
+                margin-bottom: 15px;
+                padding: 0 5px;
+            }
+
+            .social-buttons {
+                padding: 0 5px;
+                gap: 8px;
+            }
+
+            .social-btn, .social-buttons a {
+                font-size: 13px;
+                padding: 10px 15px;
+            }
+
+            .main-card-container {
+                margin: 0;
+            }
+
+            .model-section model-viewer {
+                height: 250px;
+            }
+
+            .info-section {
+                padding: 15px;
+            }
+
+            .model-title {
+                font-size: 18px;
+                margin-bottom: 6px;
+                line-height: 1.2;
+            }
+
+            .model-subtitle {
+                font-size: 13px;
+                margin-bottom: 15px;
+            }
+
+            .dimensions-block {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+
+            .dimensions-title {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+            .dimensions-grid {
+                gap: 8px;
+            }
+
+            .dimension-label {
+                font-size: 11px;
+            }
+
+            .dimension-value {
+                font-size: 15px;
+            }
+
+            .product-link {
+                font-size: 13px;
+                padding: 8px 16px;
+            }
+
+            .ar-button {
+                font-size: 9px !important;
+                padding: 3px 6px !important;
+                top: 5px !important;
+                left: 5px !important;
+                border-radius: 12px !important;
+            }
+
+            .logo-container {
+                top: 8px;
+                left: 8px;
+            }
+
+            .logo-img {
+                width: 40px;
+            }
+
+            .footer {
+                font-size: 10px;
+                margin: 20px auto 8px;
+                padding: 0 5px;
+                line-height: 1.5;
+            }
+        }
+
+        /* Dispositivos muy pequeños */
+        @media (max-width: 320px) {
+            .model-section model-viewer {
+                height: 220px;
+            }
+
+            .model-title {
+                font-size: 16px;
+            }
+
+            .ar-button {
+                font-size: 8px !important;
+                padding: 3px 5px !important;
+                top: 4px !important;
+                left: 4px !important;
+                border-radius: 10px !important;
+            }
+
+            .social-btn, .social-buttons a {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .footer {
+                font-size: 9px;
+                margin: 18px auto 6px;
+                padding: 0 3px;
+                line-height: 1.4;
+            }
+        }
+
+        /* Responsive para pantalla de carga */
+        @media (max-width: 767px) {
+            .loading-logo {
+                width: 60px;
+            }
+            .loading-title {
+                font-size: 20px;
+            }
+            .loading-subtitle {
+                font-size: 12px;
+                padding: 0 15px;
+            }
+            .progress-container {
+                max-width: 250px;
+            }
+            .loading-content {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .loading-logo {
+                width: 50px;
+            }
+            .loading-title {
+                font-size: 18px;
+            }
+            .loading-subtitle {
+                font-size: 11px;
+            }
+            .progress-container {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de carga -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <img src="Logo_InteligenciaArtificial_01.png" alt="Logo Testa Chile" class="loading-logo">
+            <div class="loading-title">CATÁLOGO 3D</div>
+            <div class="loading-subtitle">Cargando modelo 3D interactivo...</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Preparando experiencia 3D... 0%</div>
+            <div class="loading-tips">
+                💡 Tip: Una vez cargado, podrás interactuar con el modelo en 3D y usar Realidad Aumentada
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content" id="main-content">
+        <!-- Logo -->
+        <div class="logo-container">
+            <a href="https://www.instagram.com/testa.cl/">
+                <img src="Logo_InteligenciaArtificial_01.png" alt="Logo Testa Chile" class="logo-img">
+            </a>
+        </div>
+        
+        <h1>CATÁLOGO 3D | TESTA CHILE</h1>
+        
+        <div class="description">
+            <i class="fas fa-cube"></i>Explora nuestro <strong>Catálogo 3D</strong> interactivo.<br>
+            <i class="fas fa-eye"></i>Descubre trabajos realizados para nuestros clientes.<br>
+            <span class="desktop-only"><i class="fas fa-mouse-pointer"></i>Pasa el mouse sobre el modelo para verlo rotar.<br></span>
+            <span class="mobile-only"><i class="fas fa-hand-pointer"></i>Toca el modelo 3D para verlo rotar.<br></span><br>
+            <i class="fas fa-cogs icon-highlight"></i>Productos <strong>PERSONALIZADOS</strong> y <strong>A LA MEDIDA</strong>.<br>
+            <i class="fas fa-shopping-cart icon-success"></i>Disponibles al detalle y por mayor. Contamos con <strong>boleta y factura</strong>.<br>
+            <i class="fas fa-mobile-alt"></i><strong>Realidad Aumentada</strong> desde dispositivos móviles. 
+        </div>
+        
+        <!-- Botones de redes sociales -->
+        <div class="social-buttons">
+            <a href="https://www.instagram.com/testa.cl/" class="social-btn instagram">
+                Instagram
+            </a>
+            <button class="social-btn whatsapp" onclick="window.open('https://wa.me/56953706307', '_self')">
+                WhatsApp
+            </button>
+            <a href="https://linktr.ee/testa.cl" class="social-btn main-page">
+                Página principal
+            </a>
+        </div>
+        
+        <!-- Contenedor principal de la card -->
+        <div class="main-card-container">
+            <div class="card-content">
+                <!-- Sección del modelo 3D (izquierda en desktop) -->
+                <div class="model-section">
+                    <model-viewer
+                        id="main-model"
+                        src="3dmodels/GLB_Prototipo_SIMPLYGYM.glb"
+                        alt="Stand QR Acrílico con Relieve SIMPLY GYM"
+                        camera-orbit="45deg 60deg 2.5m"
+                        ar
+                        ar-modes="webxr scene-viewer quick-look"
+                        camera-controls
+                        shadow-intensity="2"
+                        shadow-softness="1.2"
+                        environment-image="environments/studio_country_hall_2k.hdr"
+                        interaction-prompt="none"
+                        xr-environment
+                        loading="eager"
+                        auto-rotate-delay="0"
+                    >
+                        <button slot="ar-button" class="ar-button">
+                            AR
+                        </button>
+                    </model-viewer>
+                </div>
+                
+                <!-- Sección de información (derecha en desktop) -->
+                <div class="info-section">
+                    <h3 class="model-title">Stand QR Acrílico con Relieve SIMPLY GYM</h3>
+                    <div class="model-subtitle">Fabricación: 20 de Julio del 2025</div>
+                    
+                    <div class="dimensions-block">
+                        <div class="dimensions-title">Dimensiones</div>
+                        <div class="dimensions-grid">
+                            <div class="dimension-item">
+                                <div class="dimension-label">Alto</div>
+                                <div class="dimension-value">12 cm</div>
+                            </div>
+                            <div class="dimension-item">
+                                <div class="dimension-label">Ancho</div>
+                                <div class="dimension-value">6 cm</div>
+                            </div>
+                            <div class="dimension-item">
+                                <div class="dimension-label">Largo</div>
+                                <div class="dimension-value">5 cm</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="https://www.instagram.com/testa.cl/" class="product-link" rel="noopener">
+                        ¡Ve aquí el producto!
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            Testa Chile 2025 <br><br> 
+            Medios de pago disponibles: Transferencia electrónica y efectivo <br><br> 
+            Próximamente, taller físico para visitas en Santiago, Chile
+        </div>
+        
+    </div> <!-- Cierre main-content -->
+
+    <script>
+    // SISTEMA DE CARGA SIMPLIFICADO
+    let loadingStartTime = Date.now();
+
+    // Actualizar barra de progreso
+    function updateProgress(percentage) {
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        if (progressBar && progressText) {
+            progressBar.style.width = percentage + '%';
+            
+            if (percentage < 30) {
+                progressText.textContent = `Iniciando carga del modelo 3D... ${percentage}%`;
+            } else if (percentage < 70) {
+                progressText.textContent = `Cargando texturas y geometrías... ${percentage}%`;
+            } else if (percentage < 95) {
+                progressText.textContent = `Optimizando experiencia 3D... ${percentage}%`;
+            } else {
+                progressText.textContent = `¡Casi listo! Preparando modelo... ${percentage}%`;
+            }
+        }
+    }
+
+    // Mostrar contenido principal cuando esté cargado
+    function showMainContent() {
+        const loadingTime = (Date.now() - loadingStartTime) / 1000;
+        console.log(`🎯 Modelo cargado en ${loadingTime.toFixed(1)}s`);
+        
+        // Pequeña pausa para mostrar 100% antes de ocultar
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainContent = document.getElementById('main-content');
+            
+            if (loadingScreen && mainContent) {
+                loadingScreen.classList.add('hidden');
+                mainContent.classList.add('loaded');
+            }
+        }, 500);
+    }
+
+    // Fallback timer - mostrar contenido después de máximo 10 segundos
+    let fallbackTimer = setTimeout(() => {
+        console.warn('⏰ Timeout: Mostrando contenido por seguridad');
+        updateProgress(100);
+        showMainContent();
+    }, 10000);
+
+    // Configurar el modelo 3D cuando esté listo el DOM
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 Iniciando carga del modelo 3D...');
+        updateProgress(0);
+        
+        const modelViewer = document.getElementById('main-model');
+        
+        if (modelViewer) {
+            // Progreso simulado durante la carga
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                if (progress < 80) {
+                    progress += Math.random() * 15;
+                    updateProgress(Math.min(progress, 80));
+                }
+            }, 200);
+            
+            // Eventos de carga del modelo
+            modelViewer.addEventListener('load', () => {
+                clearInterval(progressInterval);
+                clearTimeout(fallbackTimer);
+                updateProgress(100);
+                console.log('✅ Modelo cargado exitosamente');
+                showMainContent();
+            });
+
+            // Evento ready como fallback
+            modelViewer.addEventListener('ready', () => {
+                if (!modelViewer.hasAttribute('data-loaded')) {
+                    modelViewer.setAttribute('data-loaded', 'true');
+                    clearInterval(progressInterval);
+                    clearTimeout(fallbackTimer);
+                    updateProgress(100);
+                    console.log('✅ Modelo listo');
+                    showMainContent();
+                }
+            });
+
+            // Manejo de errores
+            modelViewer.addEventListener('error', (event) => {
+                console.warn('⚠️ Error cargando modelo:', event);
+                clearInterval(progressInterval);
+                clearTimeout(fallbackTimer);
+                updateProgress(100);
+                showMainContent();
+            });
+
+            // Detectar tipo de dispositivo para comportamiento touch/mouse
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            
+            if (isTouchDevice) {
+                // En móviles, rotar al tocar el modelo
+                modelViewer.addEventListener('touchstart', (e) => {
+                    if (modelViewer.loaded && !modelViewer.hasAttribute('auto-rotate')) {
+                        modelViewer.setAttribute('auto-rotate', '');
+                        modelViewer.setAttribute('rotation-per-second', '60deg');
+                        
+                        // Parar rotación después de 3 segundos
+                        setTimeout(() => {
+                            modelViewer.removeAttribute('auto-rotate');
+                            modelViewer.removeAttribute('rotation-per-second');
+                        }, 3000);
+                    }
+                });
+            } else {
+                // En desktop, rotar con hover
+                modelViewer.addEventListener('mouseenter', () => {
+                    if (modelViewer.loaded) {
+                        modelViewer.setAttribute('auto-rotate', '');
+                        modelViewer.setAttribute('rotation-per-second', '90deg');
+                    }
+                });
+                
+                modelViewer.addEventListener('mouseleave', () => {
+                    modelViewer.removeAttribute('auto-rotate');
+                    modelViewer.removeAttribute('rotation-per-second');
+                    modelViewer.cameraOrbit = "45deg 60deg 2.5m";
+                    modelViewer.setAttribute('camera-orbit', "45deg 60deg 2.5m");
+                });
+            }
+
+            // Configuración optimizada para diferentes dispositivos
+            if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                modelViewer.arModes = 'quick-look';
+                modelViewer.setAttribute('camera-orbit', '45deg 60deg 2m');
+                modelViewer.setAttribute('field-of-view', '30deg');
+            } else if (navigator.userAgent.match(/Android/i)) {
+                modelViewer.arModes = 'scene-viewer webxr';
+                modelViewer.setAttribute('camera-orbit', '45deg 60deg 2m');
+                modelViewer.setAttribute('field-of-view', '30deg');
+            }
+            
+            // Optimizar rendimiento en móviles
+            if (window.innerWidth < 768) {
+                modelViewer.setAttribute('shadow-intensity', '1');
+                modelViewer.setAttribute('shadow-softness', '0.8');
+            }
+        }
+        
+        // Prevenir zoom accidental en iOS
+        if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+            document.addEventListener('touchmove', function (event) {
+                if (event.scale !== 1) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
+        }
+    });
+    </script>
+</body>
+</html>
