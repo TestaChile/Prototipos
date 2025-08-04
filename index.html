@@ -73,52 +73,6 @@
         .description .icon-warning {
             color: #FF6B35;
         }
-        
-        .social-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 0 auto 30px auto;
-            max-width: 600px;
-            flex-wrap: wrap;
-        }
-        
-        .social-btn, .social-buttons a {
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 0;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            flex: 1 1 0;
-            min-width: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-decoration: none;
-        }
-        
-        .social-btn:hover, .social-buttons a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .social-btn.instagram, .social-buttons a.instagram { 
-            background: linear-gradient(45deg, #405DE6, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737); 
-        }
-        
-        .social-btn.whatsapp, .social-buttons a.whatsapp { 
-            background: #25D366; 
-        }
-        
-        .social-btn.main-page, .social-buttons a.main-page { 
-            background: #2C3E50; 
-        }
 
         .ar-button {
             position: absolute !important;
@@ -208,6 +162,27 @@
             background: transparent;
             border: none;
             border-radius: 8px;
+            display: block;
+            position: relative;
+        }
+
+        /* Asegurar que model-viewer funcione en móviles */
+        @media (max-width: 768px) {
+            .model-section model-viewer {
+                width: 100% !important;
+                height: 100% !important;
+                min-height: 250px;
+                display: block !important;
+                position: relative !important;
+                background: transparent !important;
+            }
+            
+            .model-viewer-container {
+                display: block !important;
+                width: 100% !important;
+                position: relative !important;
+                overflow: visible !important;
+            }
         }
 
         .info-section {
@@ -507,7 +482,7 @@
             .description {
                 font-size: 15px;
                 margin-bottom: 20px;
-                padding: 0 10px;
+                padding: 15px;
             }
 
             .card-content {
@@ -1023,12 +998,13 @@
         }, 500);
     }
 
-    // Fallback timer - mostrar contenido después de máximo 10 segundos
+    // Fallback timer - mostrar contenido después de máximo 15 segundos en móvil, 10 en desktop
+    const timeoutDuration = window.innerWidth <= 768 ? 15000 : 10000;
     let fallbackTimer = setTimeout(() => {
-        console.warn('⏰ Timeout: Mostrando contenido por seguridad');
+        console.warn(`⏰ Timeout (${timeoutDuration/1000}s): Mostrando contenido por seguridad`);
         updateProgress(100);
         showMainContent();
-    }, 10000);
+    }, timeoutDuration);
 
     // Configurar el modelo 3D cuando esté listo el DOM
     window.addEventListener('DOMContentLoaded', () => {
@@ -1038,6 +1014,13 @@
         const modelViewer = document.getElementById('main-model');
         
         if (modelViewer) {
+            // Detectar si es móvil
+            const isMobile = window.innerWidth <= 768;
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            
+            console.log(`📱 Dispositivo móvil detectado: ${isMobile}`);
+            console.log(`👆 Dispositivo táctil detectado: ${isTouchDevice}`);
+            
             // Progreso simulado durante la carga
             let progress = 0;
             const progressInterval = setInterval(() => {
@@ -1045,7 +1028,33 @@
                     progress += Math.random() * 15;
                     updateProgress(Math.min(progress, 80));
                 }
-            }, 200);
+            }, isMobile ? 300 : 200);
+            
+            // Configuración específica para móviles ANTES de cargar
+            if (isMobile || isTouchDevice) {
+                console.log('🔧 Aplicando configuraciones móviles...');
+                
+                // Configuraciones básicas para móviles
+                modelViewer.setAttribute('interaction-prompt', 'auto');
+                modelViewer.setAttribute('auto-rotate-delay', '3000');
+                
+                // Configuración específica por plataforma
+                if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                    modelViewer.setAttribute('ar-modes', 'quick-look');
+                    modelViewer.setAttribute('field-of-view', '45deg');
+                    modelViewer.setAttribute('camera-orbit', '45deg 60deg 2m');
+                    console.log('🍎 iOS detectado - configuración aplicada');
+                } else if (navigator.userAgent.match(/Android/i)) {
+                    modelViewer.setAttribute('ar-modes', 'scene-viewer webxr');
+                    modelViewer.setAttribute('field-of-view', '45deg');
+                    modelViewer.setAttribute('camera-orbit', '45deg 60deg 2m');
+                    console.log('🤖 Android detectado - configuración aplicada');
+                }
+                
+                // Reducir calidad de sombras en móviles
+                modelViewer.setAttribute('shadow-intensity', '1');
+                modelViewer.setAttribute('shadow-softness', '0.5');
+            }
             
             // Eventos de carga del modelo
             modelViewer.addEventListener('load', () => {
@@ -1068,21 +1077,21 @@
                 }
             });
 
-            // Manejo de errores
+            // Manejo de errores con más información
             modelViewer.addEventListener('error', (event) => {
-                console.warn('⚠️ Error cargando modelo:', event);
+                console.error('❌ Error cargando modelo:', event);
+                console.error('📍 URL del modelo:', modelViewer.src);
                 clearInterval(progressInterval);
                 clearTimeout(fallbackTimer);
                 updateProgress(100);
                 showMainContent();
             });
 
-            // Detectar tipo de dispositivo para comportamiento touch/mouse
-            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-            
+            // Comportamiento de interacción
             if (isTouchDevice) {
                 // En móviles, rotar al tocar el modelo
                 modelViewer.addEventListener('touchstart', (e) => {
+                    console.log('👆 Touch detectado en modelo');
                     if (modelViewer.loaded && !modelViewer.hasAttribute('auto-rotate')) {
                         modelViewer.setAttribute('auto-rotate', '');
                         modelViewer.setAttribute('rotation-per-second', '60deg');
@@ -1109,23 +1118,6 @@
                     modelViewer.cameraOrbit = "45deg 60deg 2.5m";
                     modelViewer.setAttribute('camera-orbit', "45deg 60deg 2.5m");
                 });
-            }
-
-            // Configuración optimizada para diferentes dispositivos
-            if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-                modelViewer.arModes = 'quick-look';
-                modelViewer.setAttribute('camera-orbit', '45deg 60deg 2m');
-                modelViewer.setAttribute('field-of-view', '30deg');
-            } else if (navigator.userAgent.match(/Android/i)) {
-                modelViewer.arModes = 'scene-viewer webxr';
-                modelViewer.setAttribute('camera-orbit', '45deg 60deg 2m');
-                modelViewer.setAttribute('field-of-view', '30deg');
-            }
-            
-            // Optimizar rendimiento en móviles
-            if (window.innerWidth < 768) {
-                modelViewer.setAttribute('shadow-intensity', '1');
-                modelViewer.setAttribute('shadow-softness', '0.8');
             }
         }
         
