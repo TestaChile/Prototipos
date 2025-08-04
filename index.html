@@ -852,6 +852,7 @@
                             xr-environment
                             loading="eager"
                             auto-rotate-delay="0"
+                            style="opacity:0; transition: opacity 0.5s ease-in-out;"
                         >
                             <button slot="ar-button" class="ar-button">
                                 <i class="fas fa-cube"></i> AR
@@ -937,86 +938,90 @@
     </div> <!-- Cierre main-content -->
 
     <script>
-    // SISTEMA DE CARGA SIMPLE (como el original que funcionaba)
-    let loadingStartTime = Date.now();
-
-    // Actualizar barra de progreso
-    function updateProgress(percentage) {
+    // Sistema de carga EXACTO como el original que funcionaba
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 Iniciando carga del modelo 3D (método original)...');
+        
+        const modelViewer = document.getElementById('main-model');
+        const loadingScreen = document.getElementById('loading-screen');
+        const mainContent = document.getElementById('main-content');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         
-        if (progressBar && progressText) {
-            progressBar.style.width = percentage + '%';
-            
-            if (percentage < 30) {
-                progressText.textContent = `Iniciando carga del modelo 3D... ${percentage}%`;
-            } else if (percentage < 70) {
-                progressText.textContent = `Cargando texturas y geometrías... ${percentage}%`;
-            } else if (percentage < 95) {
-                progressText.textContent = `Optimizando experiencia 3D... ${percentage}%`;
-            } else {
-                progressText.textContent = `¡Casi listo! Preparando modelo... ${percentage}%`;
-            }
-        }
-    }
-
-    // Mostrar contenido principal cuando esté cargado
-    function showMainContent() {
-        const loadingTime = (Date.now() - loadingStartTime) / 1000;
-        console.log(`🎯 Modelo cargado en ${loadingTime.toFixed(1)}s`);
+        // Detectar dispositivo móvil
+        const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        console.log(`📱 Dispositivo móvil: ${isMobile}`);
         
-        setTimeout(() => {
-            const loadingScreen = document.getElementById('loading-screen');
-            const mainContent = document.getElementById('main-content');
+        // Progreso inicial
+        let progress = 0;
+        progressBar.style.width = '0%';
+        progressText.textContent = 'Iniciando carga del modelo 3D... 0%';
+        
+        // Simular progreso durante la carga
+        const progressInterval = setInterval(() => {
+            if (progress < 80) {
+                progress += Math.random() * 10;
+                progressBar.style.width = Math.min(progress, 80) + '%';
+                
+                if (progress < 30) {
+                    progressText.textContent = `Cargando geometría... ${Math.floor(progress)}%`;
+                } else if (progress < 60) {
+                    progressText.textContent = `Cargando texturas... ${Math.floor(progress)}%`;
+                } else {
+                    progressText.textContent = `Optimizando modelo... ${Math.floor(progress)}%`;
+                }
+            }
+        }, 200);
+        
+        // Función para completar la carga
+        function completeLoading() {
+            console.log('✅ Completando carga del modelo');
+            clearInterval(progressInterval);
             
-            if (loadingScreen && mainContent) {
-                loadingScreen.classList.add('hidden');
+            progressBar.style.width = '100%';
+            progressText.textContent = '¡Carga completada! 100%';
+            
+            setTimeout(() => {
+                // Ocultar pantalla de carga
+                loadingScreen.style.opacity = '0';
+                // Mostrar modelo
+                modelViewer.style.opacity = '1';
+                // Mostrar contenido principal
                 mainContent.classList.add('loaded');
-            }
-        }, 500);
-    }
-
-    // Configurar el modelo 3D cuando esté listo el DOM
-    window.addEventListener('DOMContentLoaded', () => {
-        console.log('🚀 Iniciando carga simple del modelo 3D...');
-        updateProgress(0);
-        
-        const modelViewer = document.getElementById('main-model');
+                
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 300);
+        }
         
         if (modelViewer) {
-            // Progreso simulado durante la carga
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                if (progress < 80) {
-                    progress += Math.random() * 15;
-                    updateProgress(Math.min(progress, 80));
-                }
-            }, 200);
-            
-            // Fallback timer simple - 8 segundos máximo
-            const fallbackTimer = setTimeout(() => {
-                console.warn('⏰ Timeout: Mostrando contenido por seguridad');
-                clearInterval(progressInterval);
-                updateProgress(100);
-                showMainContent();
-            }, 8000);
-            
-            // Eventos básicos del modelo (como en el original)
+            // Evento de carga exitosa (IGUAL al original)
             modelViewer.addEventListener('load', () => {
-                clearInterval(progressInterval);
-                clearTimeout(fallbackTimer);
-                updateProgress(100);
-                console.log('✅ Modelo cargado exitosamente');
-                showMainContent();
+                console.log('✅ Modelo cargado exitosamente via evento load');
+                completeLoading();
             });
-
-            modelViewer.addEventListener('error', (event) => {
-                console.error('❌ Error cargando modelo:', event);
+            
+            // Evento de error
+            modelViewer.addEventListener('error', (error) => {
+                console.error('❌ Error cargando modelo:', error);
                 clearInterval(progressInterval);
-                clearTimeout(fallbackTimer);
-                updateProgress(100);
-                showMainContent();
+                
+                // Mostrar contenido de todas formas
+                setTimeout(() => {
+                    completeLoading();
+                }, 1000);
             });
+            
+            // Timeout según dispositivo (IGUAL al original)
+            const timeoutDuration = isMobile ? 15000 : 10000;
+            
+            setTimeout(() => {
+                if (loadingScreen.style.display !== 'none') {
+                    console.log('⚠️ Timeout - mostrando contenido por seguridad');
+                    completeLoading();
+                }
+            }, timeoutDuration);
         }
     });
     </script>
