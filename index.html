@@ -162,27 +162,6 @@
             background: transparent;
             border: none;
             border-radius: 8px;
-            display: block;
-            position: relative;
-        }
-
-        /* Asegurar que model-viewer funcione en móviles */
-        @media (max-width: 768px) {
-            .model-section model-viewer {
-                width: 100% !important;
-                height: 100% !important;
-                min-height: 250px;
-                display: block !important;
-                position: relative !important;
-                background: transparent !important;
-            }
-            
-            .model-viewer-container {
-                display: block !important;
-                width: 100% !important;
-                position: relative !important;
-                overflow: visible !important;
-            }
         }
 
         .info-section {
@@ -958,7 +937,7 @@
     </div> <!-- Cierre main-content -->
 
     <script>
-    // SISTEMA DE CARGA SIMPLIFICADO
+    // SISTEMA DE CARGA SIMPLE (como el original que funcionaba)
     let loadingStartTime = Date.now();
 
     // Actualizar barra de progreso
@@ -986,7 +965,6 @@
         const loadingTime = (Date.now() - loadingStartTime) / 1000;
         console.log(`🎯 Modelo cargado en ${loadingTime.toFixed(1)}s`);
         
-        // Pequeña pausa para mostrar 100% antes de ocultar
         setTimeout(() => {
             const loadingScreen = document.getElementById('loading-screen');
             const mainContent = document.getElementById('main-content');
@@ -998,29 +976,14 @@
         }, 500);
     }
 
-    // Fallback timer - mostrar contenido después de máximo 15 segundos en móvil, 10 en desktop
-    const timeoutDuration = window.innerWidth <= 768 ? 15000 : 10000;
-    let fallbackTimer = setTimeout(() => {
-        console.warn(`⏰ Timeout (${timeoutDuration/1000}s): Mostrando contenido por seguridad`);
-        updateProgress(100);
-        showMainContent();
-    }, timeoutDuration);
-
     // Configurar el modelo 3D cuando esté listo el DOM
     window.addEventListener('DOMContentLoaded', () => {
-        console.log('🚀 Iniciando carga del modelo 3D...');
+        console.log('🚀 Iniciando carga simple del modelo 3D...');
         updateProgress(0);
         
         const modelViewer = document.getElementById('main-model');
         
         if (modelViewer) {
-            // Detectar si es móvil
-            const isMobile = window.innerWidth <= 768;
-            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-            
-            console.log(`📱 Dispositivo móvil detectado: ${isMobile}`);
-            console.log(`👆 Dispositivo táctil detectado: ${isTouchDevice}`);
-            
             // Progreso simulado durante la carga
             let progress = 0;
             const progressInterval = setInterval(() => {
@@ -1028,35 +991,17 @@
                     progress += Math.random() * 15;
                     updateProgress(Math.min(progress, 80));
                 }
-            }, isMobile ? 300 : 200);
+            }, 200);
             
-            // Configuración específica para móviles ANTES de cargar
-            if (isMobile || isTouchDevice) {
-                console.log('🔧 Aplicando configuraciones móviles...');
-                
-                // Configuraciones básicas para móviles
-                modelViewer.setAttribute('interaction-prompt', 'auto');
-                modelViewer.setAttribute('auto-rotate-delay', '3000');
-                
-                // Configuración específica por plataforma
-                if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-                    modelViewer.setAttribute('ar-modes', 'quick-look');
-                    modelViewer.setAttribute('field-of-view', '45deg');
-                    modelViewer.setAttribute('camera-orbit', '45deg 60deg 2m');
-                    console.log('🍎 iOS detectado - configuración aplicada');
-                } else if (navigator.userAgent.match(/Android/i)) {
-                    modelViewer.setAttribute('ar-modes', 'scene-viewer webxr');
-                    modelViewer.setAttribute('field-of-view', '45deg');
-                    modelViewer.setAttribute('camera-orbit', '45deg 60deg 2m');
-                    console.log('🤖 Android detectado - configuración aplicada');
-                }
-                
-                // Reducir calidad de sombras en móviles
-                modelViewer.setAttribute('shadow-intensity', '1');
-                modelViewer.setAttribute('shadow-softness', '0.5');
-            }
+            // Fallback timer simple - 8 segundos máximo
+            const fallbackTimer = setTimeout(() => {
+                console.warn('⏰ Timeout: Mostrando contenido por seguridad');
+                clearInterval(progressInterval);
+                updateProgress(100);
+                showMainContent();
+            }, 8000);
             
-            // Eventos de carga del modelo
+            // Eventos básicos del modelo (como en el original)
             modelViewer.addEventListener('load', () => {
                 clearInterval(progressInterval);
                 clearTimeout(fallbackTimer);
@@ -1065,69 +1010,13 @@
                 showMainContent();
             });
 
-            // Evento ready como fallback
-            modelViewer.addEventListener('ready', () => {
-                if (!modelViewer.hasAttribute('data-loaded')) {
-                    modelViewer.setAttribute('data-loaded', 'true');
-                    clearInterval(progressInterval);
-                    clearTimeout(fallbackTimer);
-                    updateProgress(100);
-                    console.log('✅ Modelo listo');
-                    showMainContent();
-                }
-            });
-
-            // Manejo de errores con más información
             modelViewer.addEventListener('error', (event) => {
                 console.error('❌ Error cargando modelo:', event);
-                console.error('📍 URL del modelo:', modelViewer.src);
                 clearInterval(progressInterval);
                 clearTimeout(fallbackTimer);
                 updateProgress(100);
                 showMainContent();
             });
-
-            // Comportamiento de interacción
-            if (isTouchDevice) {
-                // En móviles, rotar al tocar el modelo
-                modelViewer.addEventListener('touchstart', (e) => {
-                    console.log('👆 Touch detectado en modelo');
-                    if (modelViewer.loaded && !modelViewer.hasAttribute('auto-rotate')) {
-                        modelViewer.setAttribute('auto-rotate', '');
-                        modelViewer.setAttribute('rotation-per-second', '60deg');
-                        
-                        // Parar rotación después de 3 segundos
-                        setTimeout(() => {
-                            modelViewer.removeAttribute('auto-rotate');
-                            modelViewer.removeAttribute('rotation-per-second');
-                        }, 3000);
-                    }
-                });
-            } else {
-                // En desktop, rotar con hover
-                modelViewer.addEventListener('mouseenter', () => {
-                    if (modelViewer.loaded) {
-                        modelViewer.setAttribute('auto-rotate', '');
-                        modelViewer.setAttribute('rotation-per-second', '90deg');
-                    }
-                });
-                
-                modelViewer.addEventListener('mouseleave', () => {
-                    modelViewer.removeAttribute('auto-rotate');
-                    modelViewer.removeAttribute('rotation-per-second');
-                    modelViewer.cameraOrbit = "45deg 60deg 2.5m";
-                    modelViewer.setAttribute('camera-orbit', "45deg 60deg 2.5m");
-                });
-            }
-        }
-        
-        // Prevenir zoom accidental en iOS
-        if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-            document.addEventListener('touchmove', function (event) {
-                if (event.scale !== 1) {
-                    event.preventDefault();
-                }
-            }, { passive: false });
         }
     });
     </script>
